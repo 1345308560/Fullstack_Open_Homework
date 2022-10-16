@@ -1,3 +1,4 @@
+import personService from '../services/personService'
 const AddPerson = ({persons,setNewPerson,newPerson,setNewName})=>{
     const addName = (event) => {
         event.preventDefault()
@@ -6,9 +7,23 @@ const AddPerson = ({persons,setNewPerson,newPerson,setNewName})=>{
             number:newPerson.phoneNumber,
             id:persons.length+1
         }
-        var check=persons.find(p => p.name===newObj.name)
-        if(check === undefined) setNewPerson(persons.concat(newObj))
-        else window.alert(`${newPerson.name} is already added to phonebook`)
+        const check=persons.find(p => p.name===newObj.name)
+        if(check === undefined) {
+            personService
+                .create(newObj)
+                .then(personData => setNewPerson(persons.concat(personData)))
+        }
+        else {
+            if (window.confirm(newPerson.name+' is already added, replace the old number with the new one?')){
+                console.log(check)
+                newObj.id=check.id
+                personService
+                    .update(check.id,newObj)
+                    .then(personData => 
+                        setNewPerson(persons.map(p=> p.id===check.id?personData:p))
+                    )
+            }
+        }
         setNewName({name:'',phoneNumber:''})
     }
     const handleNewName = (event) =>{

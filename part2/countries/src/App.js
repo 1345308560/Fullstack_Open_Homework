@@ -20,11 +20,6 @@ const App = () => {
 
   const [dataToShow,setDataToShow]= useState(countriesData);
   
-  // const dataToShow = countriesData.filter(country =>{
-  //   const str1=country.name.common.toLowerCase()
-  //   const str2=newFilter.toLowerCase()
-  //   return str1.match(str2)!=null
-  // })
   const api_key = process.env.REACT_APP_API_KEY
   console.log(api_key)
   return (
