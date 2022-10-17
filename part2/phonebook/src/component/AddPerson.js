@@ -1,5 +1,5 @@
 import personService from '../services/personService'
-const AddPerson = ({persons,setNewPerson,newPerson,setNewName})=>{
+const AddPerson = ({persons,setNewPerson,newPerson,setNewName,setMessage})=>{
     const addName = (event) => {
         event.preventDefault()
         const newObj={
@@ -11,17 +11,41 @@ const AddPerson = ({persons,setNewPerson,newPerson,setNewName})=>{
         if(check === undefined) {
             personService
                 .create(newObj)
-                .then(personData => setNewPerson(persons.concat(personData)))
+                .then(personData => {
+                    const tempMessage = {
+                        information:'Added '+newObj.name,
+                        type:1
+                    }
+                    setMessage(tempMessage)
+                    setTimeout(() => {
+                        setMessage({information:null,type:1})
+                    }, 5000)
+                    setNewPerson(persons.concat(personData))
+                })
         }
         else {
             if (window.confirm(newPerson.name+' is already added, replace the old number with the new one?')){
-                console.log(check)
                 newObj.id=check.id
                 personService
                     .update(check.id,newObj)
-                    .then(personData => 
+                    .then(personData => {
+                        setMessage('Changed '+newObj.name)
+                        setTimeout(() => {
+                            setMessage({information:null,type:1})
+                        }, 5000)
                         setNewPerson(persons.map(p=> p.id===check.id?personData:p))
-                    )
+                    })
+                    .catch(error =>{
+                        const tempMessage = {
+                            information:'Information of '+newObj.name+' has already been removed from server.',
+                            type:2
+                        }
+                        setMessage(tempMessage)
+                        setTimeout(() => {
+                            setMessage({information:null,type:1})
+                        }, 5000)
+                        setNewPerson(persons.filter(p=> p.id !== check.id))
+                    })
             }
         }
         setNewName({name:'',phoneNumber:''})
